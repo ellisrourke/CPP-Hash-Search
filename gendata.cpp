@@ -6,7 +6,6 @@
 #include <algorithm>
 
 using namespace std;
-
 string names[100][2] =
         {
                 {	"Liam"		,	"Emma"	}	,
