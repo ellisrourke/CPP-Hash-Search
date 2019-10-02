@@ -4,6 +4,8 @@
 #include <tuple>
 #include <ctime>
 #include <algorithm>
+#include <ostream>
+#include <fstream>
 
 using namespace std;
 string names[100][2] =
@@ -114,8 +116,11 @@ string subjects[4] = {"Physics","Mathematics","Chemistry","Biology"};
 
 tuple<int,int,int,int> marks[200*4];	// nameid, boy/girl, subject, mark
 
-int main()
+int getdata()
 {
+    std::ofstream file("data.txt");
+
+
     srand (time(NULL));
     int n = rand()% 50 + 50;
     for(int i = 0; i < n; ++i)	// name id

@@ -1,70 +1,94 @@
 #include <iostream>
 #include <vector>
-#include <sstream>
-#include <map>
+#include <set>
 #include <unordered_map>
 #include <chrono>
+#include <array>
+#include "gendata.h"
+#include <fstream>
+class compareGrades{
+public:
+    bool operator()(const std::tuple<std::string, std::string, int> &a, const std::tuple<std::string, std::string, int> &b)const{
+        return std::get<2>(a) <= std::get<2>(b);
+    }
+};
+
+class compareNames{
+public:
+    bool operator()(const std::tuple<std::string, std::string, int> &a, const std::tuple<std::string, std::string, int> &b) const {
+        const std::string &nameA = std::get<0>(a);
+        const std::string &subjectA = std::get<1>(a);
+        int gradeA = std::get<2>(a);
+
+        const std::string &nameB = std::get<0>(b);
+        const std::string &subjectB = std::get<1>(b);
+        int gradeB = std::get<2>(b);
+
+        bool result;
+        if (nameA < nameB) {
+            return true;
+        } else if (nameA == nameB){
+            if (subjectA < subjectB)
+                return true;
+            else
+                return subjectA < subjectB;
+        }
+        return false;
+    }
+};
+
 typedef std::pair<std::string,std::string> nameSub;
 struct hashFunc{
     size_t operator()(const nameSub &test) const{
-        std::cout << (std::hash<std::string>()(test.first) * std::hash<std::string>()(test.second)) << std::endl;
+        //std::cout << (std::hash<std::string>()(test.first) * std::hash<std::string>()(test.second)) << std::endl;
         return std::hash<std::string>()(test.first) * std::hash<std::string>()(test.second);
     }
-
-    /*bool operator==(const nameSub &test , const nameSub &test2) const
-    {
-        return test.first == test2.first && test.second == test2.second;
-    }*/
 };
 
-int main(){
-    auto start = std::chrono::steady_clock::now();
-    clock_t startClock = clock(); // record the clock at start
+std::string exists(std::unordered_map<nameSub,int,hashFunc> & students, std::pair<std::string, std::string>  const & ser) {
+    if (students.find(ser) == students.end())
+        return "Element Not Present\n";
+    else
+        return "Element Present\n";
+}
 
-    //std::map<std::pair<std::string,std::string>, int> students;
-    //std::map<std::pair<std::string,std::string>, int>::iterator itr;
-
+    int main(){
     std::unordered_map<nameSub,int,hashFunc> students;
     std::unordered_map<nameSub,int,hashFunc>::iterator itr;
+    std::set<std::pair<std::string,std::string>> nameIndirect;
+    std::set<std::tuple<int,std::string,std::string>> gradeIndirect;
+    std::set<std::tuple<int,std::string,std::string>>::iterator gradeItr;
+    std::set<std::pair<std::string,std::string>>::iterator setItr;
+
+
 
     std::string line;
-    std::stringstream test;
-    std::string word;
-    while (std::getline(std::cin, line)) {
-        //std::cout << line << std::endl;
-        std::string name;
-        std::string subject;
-        int grade;
-        std::cin >> name >> subject >> grade;
-        //std::cout << name << subject << grade << std::endl;
-        //students.insert(std::make_pair(std::make_pair(name, subject),grade));
-        std::string agg = name + subject;
+    std::ifstream infile("data.txt");
+
+    std::string name;
+    std::string subject;
+    int grade;
+
+    while (infile >> name >> subject >> grade) {
+        //students[nameSub("Ellis","Mathematics")] = 67;
         students[nameSub(name,subject)] = grade;
+        nameIndirect.emplace(name,subject);
+        gradeIndirect.emplace(grade,name,subject);
     }
 
-    //std::map<std::string,std::string> students;
-    //gquiz1.insert(pair<int, int>(1, 40));
-    //students.insert(std::pair<std::string, std::string>("b", "a"));
-    //std::map<std::string, std::string>::iterator itr;
 
-    for (itr = students.begin(); itr != students.end(); ++itr) {
-       std::cout  << itr->first.first  << " " <<   itr->first.second  << " " << itr->second << "From Map" << std::endl;
+    for (setItr = nameIndirect.begin(); setItr != nameIndirect.end(); ++setItr){
+       std::cout  << setItr->first  << " " <<   setItr->second  << " "  << students[std::make_pair(setItr->first,setItr->second)] << std::endl;
+
     }
-    std::cout << std::endl;
+    std::cout << "====================================================" << std::endl;
+    //std::cout << students[nameSub("Ellis","Mathematics")];
+    //std::cout << students[std::make_pair("Zoey","Mathematics")];
+    //std::cout << exists(students,nameSub("Zoey","Physics"));
+    for (gradeItr = gradeIndirect.begin(); gradeItr != gradeIndirect.end(); ++gradeItr){
+        std::cout  << std::get<1>(*gradeItr)  << " " <<   std::get<2>(*gradeItr)  << " "  << students[std::make_pair(std::get<1>(*gradeItr),std::get<2>(*gradeItr))] << std::endl;
 
-
-
-
-
-    auto end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time in milliseconds : "
-         << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-         << " ms" << std::endl;
-
-
-
-
-
+    }
 
 
 
