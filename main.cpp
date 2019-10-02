@@ -58,8 +58,8 @@ void displayByName(std::unordered_map<nameSub,int,hashFunc> &students,std::set<s
 }
 
 void checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect,std::string &name){
-    std::string m = "Mathematics";
-    if(students[nameSub(name,m)]){
+    std::string m = "Biology";
+    if(!students[nameSub(name,m)]){
         std::cout << "Does not exist... add? -> (y/n)";
         char option;
         std::cin >> option;
@@ -79,12 +79,6 @@ void checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std
     }
 }
 
-std::string exists(std::unordered_map<nameSub,int,hashFunc> & students, std::pair<std::string, std::string>  const & ser) {
-    if (students.find(ser) == students.end())
-        return "Element Not Present\n";
-    else
-        return "Element Present\n";
-}
 
     int main(){
     std::unordered_map<nameSub,int,hashFunc> students;
@@ -110,39 +104,26 @@ std::string exists(std::unordered_map<nameSub,int,hashFunc> & students, std::pai
         gradeIndirect.emplace(grade,name,subject);
     }
 
-    /*
-    for (setItr = nameIndirect.begin(); setItr != nameIndirect.end(); ++setItr){
-       std::cout  << setItr->first  << " " <<   setItr->second  << " "  << students[std::make_pair(setItr->first,setItr->second)] << std::endl;
-    }
-    std::cout << "====================================================" << std::endl;
-    //std::cout << students[nameSub("Ellis","Mathematics")];
-    //std::cout << students[std::make_pair("Zoey","Mathematics")];
-    //std::cout << exists(students,nameSub("Zoey","Physics"));
-    for (gradeItr = gradeIndirect.begin(); gradeItr != gradeIndirect.end(); ++gradeItr){
-        std::cout  << std::get<1>(*gradeItr)  << " " <<   std::get<2>(*gradeItr)  << " "  << students[std::make_pair(std::get<1>(*gradeItr),std::get<2>(*gradeItr))] << std::endl;
-    }
-*/
-    //displayByGrade(students,gradeIndirect,gradeItr);
     displayByName(students,nameIndirect,setItr);
     std::cout << "====================================================" << std::endl;
-    displayByGrade(students,gradeIndirect,gradeItr);
+    //displayByGrade(students,gradeIndirect,gradeItr);
 
-
+    //checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect,std::string &name){
+    std::string searchStudent = "Ellis";
+    checkRecord(students,nameIndirect,gradeIndirect,searchStudent);
+    displayByName(students,nameIndirect,setItr);
 
 }
 
-
-//                  | map             | unordered_map
+//unordered_map
 //---------------------------------------------------------
-//Ordering        | increasing  order   | no ordering
-//                | (by default)        |
+//Ordering        | no ordering
 //
-//Implementation  | Self balancing BST  | Hash Table
-//                | like Red-Black Tree |
+//search time     | O(1) -> Average
+//                | O(n) -> Worst Case
 //
-//search time     | log(n)              | O(1) -> Average
-//                |                     | O(n) -> Worst Case
+//Insertion time  | O(1) -> Average
+////              | O(n) -> Worst Case
 //
-//Insertion time  | log(n) + Rebalance  | Same as search
-//
-//Deletion time   | log(n) + Rebalance  | Same as search
+//Deletion time   | O(1) -> Average
+////              | O(n) -> Worst Case
