@@ -38,6 +38,17 @@ public:
     }
 };
 
+class findName {
+public:
+    explicit findName(std::string &name) : name{name} {};
+
+    bool operator()(const std::pair<std::string,std::string> &toFind){
+        return toFind.first == this->name;
+    }
+
+    std::string name;
+};
+
 struct hashFunc{
     size_t operator()(const nameSub &test) const{
         //std::cout << (std::hash<std::string>()(test.first) * std::hash<std::string>()(test.second)) << std::endl;
@@ -75,11 +86,18 @@ void checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std
             }
         }
     } else {
-        std::cout << "Record exists in data";
+        std::cout << "Record exists in data"  ;
     }
 }
 
-
+void displayStudent(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect,std::string &name,std::set<std::pair<std::string,std::string>>::iterator &setItr){
+    auto itr = std::find_if(nameIndirect.begin(), nameIndirect.end(),findName(name));
+    std::string subs[] = {"Biology","Chemistry","Mathematics","Physics"};
+    std::string m = "Biology";
+    for(auto & sub : subs){
+        std::cout << name << " " << sub << " " << students[std::make_pair(name,sub)] << std::endl;
+    }
+}
     int main(){
     std::unordered_map<nameSub,int,hashFunc> students;
     std::unordered_map<nameSub,int,hashFunc>::iterator itr;
@@ -104,16 +122,17 @@ void checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std
         gradeIndirect.emplace(grade,name,subject);
     }
 
-    displayByName(students,nameIndirect,setItr);
+    //displayByName(students,nameIndirect,setItr);
     std::cout << "====================================================" << std::endl;
     //displayByGrade(students,gradeIndirect,gradeItr);
 
     //checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect,std::string &name){
-    std::string searchStudent = "Ellis";
-    checkRecord(students,nameIndirect,gradeIndirect,searchStudent);
-    displayByName(students,nameIndirect,setItr);
-
-}
+    std::string searchStudent = "Zoe";
+    //checkRecord(students,nameIndirect,gradeIndirect,searchStudent);
+    //displayByName(students,nameIndirect,setItr);
+    std::cout << "====================================================" << std::endl;
+    displayStudent(students,nameIndirect,searchStudent,setItr);
+    }
 
 //unordered_map
 //---------------------------------------------------------
@@ -127,3 +146,9 @@ void checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std
 //
 //Deletion time   | O(1) -> Average
 ////              | O(n) -> Worst Case
+
+
+//TO ADD
+//= sort by certain grades, skip 4 records at a time
+//= sort by total marks
+//= how many students have obtained more than a given marks in a particular subject or in total marks
