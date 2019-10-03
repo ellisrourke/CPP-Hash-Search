@@ -98,6 +98,13 @@ void displayStudent(std::unordered_map<nameSub,int,hashFunc> &students,std::set<
         std::cout << name << " " << sub << " " << students[std::make_pair(name,sub)] << std::endl;
     }
 }
+
+void displaySubjectGrade(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect, std::set<std::tuple<int,std::string,std::string>>::iterator &gradeItr){
+    for (gradeItr = gradeIndirect.begin(); gradeItr != gradeIndirect.end();){
+        std::cout  << std::get<1>(*gradeItr)  << " " <<   std::get<2>(*gradeItr)  << " "  << students[std::make_pair(std::get<1>(*gradeItr),std::get<2>(*gradeItr))] << std::endl;
+        advance(gradeItr,4);
+    }
+}
     int main(){
     std::unordered_map<nameSub,int,hashFunc> students;
     std::unordered_map<nameSub,int,hashFunc>::iterator itr;
