@@ -100,72 +100,160 @@ void displayStudent(std::unordered_map<nameSub,int,hashFunc> &students,std::set<
     }
 }
 
-void displaySubjectGrade(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &indirect, std::set<std::pair<std::string,std::string>>::iterator &nameItr,int choice){
+void displaySubjectGrade(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &indirect, std::set<std::pair<std::string,std::string>>::iterator &nameItr,int choice,int threshold){
     nameItr = indirect.begin();
     advance(nameItr,choice);
     for (;nameItr != indirect.end();){
         if(nameItr != indirect.end()) {
-            std::cout << nameItr->first << " " << nameItr->second << " " << students[std::make_pair(nameItr->first, nameItr->second)] << std::endl;
+            int grade = students[std::make_pair(nameItr->first, nameItr->second)];
+            if(grade >= threshold) {
+                std::cout << nameItr->first << " " << nameItr->second << " " << grade << std::endl;
+            }
             advance(nameItr, 4);
         }
     }
 }
 
-void dispalyTotalMarks(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect, std::set<std::pair<std::string,std::string>>::iterator &setItr){
+void dispalyTotalMarks(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect, std::set<std::pair<std::string,std::string>>::iterator &setItr,int threshold){
     //std::vector data;
     std::vector<std::pair<int,std::string>> studentsByGrade;
     auto itr = nameIndirect.begin();
     while(itr != nameIndirect.end()) {
         const std::string &name = std::get<0>(*itr);
-        std::cout << name << " ";
         int sumGrades = 0;
         for (int i = 0; i < 4; i++) {
             sumGrades += students[std::make_pair(itr->first,itr->second)];
             //std::cout << std::get<0>(*itr) << " " << std::get<1>(*itr) << " " << std::get<2>(*itr) << std::endl;
             std::advance(itr, 1);
         }
-        std::cout << sumGrades << std::endl;
+        if(sumGrades>=threshold)
+            std::cout << name << " " << sumGrades << std::endl;
 }
 }
     int main() {
+        //hash table to store student grades
         std::unordered_map<nameSub, int, hashFunc> students;
-        std::unordered_map<nameSub, int, hashFunc>::iterator itr;
+
+        //indirect sets to allow sorting of data without modification of origional data stucture
         std::set<std::pair<std::string, std::string>> nameIndirect;
         std::set<std::tuple<int, std::string, std::string>> gradeIndirect;
+
+        //data structure iterators
+        std::unordered_map<nameSub, int, hashFunc>::iterator itr;
         std::set<std::tuple<int, std::string, std::string>>::iterator gradeItr;
         std::set<std::pair<std::string, std::string>>::iterator setItr;
 
-
+        //file setup
         std::string line;
         std::ifstream infile("data.txt");
 
+        //temp variables
         std::string name;
         std::string subject;
         int grade;
 
+        //loop to get input student records from the file
         while (infile >> name >> subject >> grade) {
             //students[nameSub("Ellis","Mathematics")] = 67;
             students[nameSub(name, subject)] = grade;
             nameIndirect.emplace(name, subject);
             gradeIndirect.emplace(grade, name, subject);
         }
+        std::cout << "1:\n";
+        int select = 0;
+        while(select != -1){
+            std::cout << "Enter selection -> ";
+            std::cin >> select;
 
+            switch(select){
+                case 1 : {//display students by name
+                    std::cout << "--------------------------" << std::endl;
+                    displayByName(students,nameIndirect,setItr);
+                    std::cout << "--------------------------" << std::endl;
+
+                    break;
+                }
+                case 2 : {//display students by grade
+                    std::cout << "--------------------------" << std::endl;
+                    displayByGrade(students,gradeIndirect,gradeItr);
+                    std::cout << "--------------------------" << std::endl;
+
+                    break;
+                }
+                case 3 : {//display total marks for each student
+                    std::cout << "--------------------------" << std::endl;
+                    dispalyTotalMarks(students, nameIndirect, setItr,0);
+                    std::cout << "--------------------------" << std::endl;
+                    break;
+                }
+                case 4 : {//display total marks for each student above threshold
+                    int threshold;
+                    std::cout << "--------------------------" << std::endl;
+                    std::cout << "Enter threshold ->  ";
+                    std::cin >> threshold;
+                    dispalyTotalMarks(students, nameIndirect, setItr,threshold);
+                    std::cout << "--------------------------" << std::endl;
+
+                    break;
+                }
+                case 5 : {//display student marks for certain subject
+                    std::cout << "--------------------------" << std::endl;
+                    std::cout << "Select Subject\n1: Biology\n2: Chemistry\n3: Mathematics\n4: Physics\n";
+                    int selection;
+                    std::cin >> selection;
+                    displaySubjectGrade(students, nameIndirect, setItr, selection-1,0);
+                    std::cout << "--------------------------" << std::endl;
+
+                    break;
+                }
+                case 6 : {//display student marks for certain subject above threshold
+                    std::cout << "--------------------------" << std::endl;
+                    std::cout << "Select Subject\n1: Biology\n2: Chemistry\n3: Mathematics\n4: Physics\n";
+                    int selection;
+                    int threshold;
+                    std::cin >> selection;
+                    std::cout << "Enter threshold -> ";
+                    std::cin >> threshold;
+                    displaySubjectGrade(students, nameIndirect, setItr, selection-1,threshold);
+                    std::cout << "--------------------------" << std::endl;
+                    break;
+                }
+                case 7 : {//check if student exists
+                    std::cout << "--------------------------" << std::endl;
+                    std::cout << "Enter students name -> ";
+                    std::string searchStudent;
+                    std::cin >> searchStudent;
+
+                    checkRecord(students,nameIndirect,gradeIndirect,searchStudent);
+                    std::cout << "--------------------------" << std::endl;
+
+                    break;
+                }
+                case 8 : {//display all a single students grades
+                    std::cout << "--------------------------" << std::endl;
+                    std::cout << "Enter students name -> ";
+                    std::string searchStudent;
+                    std::cin >> searchStudent;
+
+                    displayStudent(students,nameIndirect,searchStudent,setItr);
+                    std::cout << "--------------------------" << std::endl;
+
+                    break;
+                }
+                default:{
+                    break;
+                }
+
+
+            }
+        }
         //displayByName(students,nameIndirect,setItr);
-        std::cout << "====================================================" << std::endl;
         //displayByGrade(students,gradeIndirect,gradeItr);
-
         //checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect,std::string &name){
-        std::string searchStudent = "Zoe";
         //checkRecord(students,nameIndirect,gradeIndirect,searchStudent);
         //displayByName(students,nameIndirect,setItr);
-        std::cout << "====================================================" << std::endl;
-
-        //displaySubjectGrade(students, nameIndirect, setItr, 3);
-        //void displaySubjectGrade(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect, std::set<std::tuple<int,std::string,std::string>>::iterator &gradeItr){
-
-        dispalyTotalMarks(students, nameIndirect, setItr);
-
-
+        //displaySubjectGrade(students, nameIndirect, setItr, 3,93);
+        //dispalyTotalMarks(students, nameIndirect, setItr,0);
         //std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect, std::set<std::pair<std::string,std::string>>::iterator &setItr
 
     }
@@ -185,6 +273,5 @@ void dispalyTotalMarks(std::unordered_map<nameSub,int,hashFunc> &students,std::s
 ////              | O(n) -> Worst Case
 
 
-//TO ADD
-//= sort by total marks
-//= how many students have obtained more than a given marks in a particular subject or in total marks
+
+//= menu
