@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <chrono>
 #include <array>
+#include <vector>
 #include "gendata.h"
 #include <fstream>
 typedef std::pair<std::string,std::string> nameSub;
@@ -99,47 +100,76 @@ void displayStudent(std::unordered_map<nameSub,int,hashFunc> &students,std::set<
     }
 }
 
-void displaySubjectGrade(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect, std::set<std::tuple<int,std::string,std::string>>::iterator &gradeItr){
-    for (gradeItr = gradeIndirect.begin(); gradeItr != gradeIndirect.end();){
-        std::cout  << std::get<1>(*gradeItr)  << " " <<   std::get<2>(*gradeItr)  << " "  << students[std::make_pair(std::get<1>(*gradeItr),std::get<2>(*gradeItr))] << std::endl;
-        advance(gradeItr,4);
+void displaySubjectGrade(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &indirect, std::set<std::pair<std::string,std::string>>::iterator &nameItr,int choice){
+    nameItr = indirect.begin();
+    advance(nameItr,choice);
+    for (;nameItr != indirect.end();){
+        if(nameItr != indirect.end()) {
+            std::cout << nameItr->first << " " << nameItr->second << " " << students[std::make_pair(nameItr->first, nameItr->second)] << std::endl;
+            advance(nameItr, 4);
+        }
     }
 }
-    int main(){
-    std::unordered_map<nameSub,int,hashFunc> students;
-    std::unordered_map<nameSub,int,hashFunc>::iterator itr;
-    std::set<std::pair<std::string,std::string>> nameIndirect;
-    std::set<std::tuple<int,std::string,std::string>> gradeIndirect;
-    std::set<std::tuple<int,std::string,std::string>>::iterator gradeItr;
-    std::set<std::pair<std::string,std::string>>::iterator setItr;
+
+void dispalyTotalMarks(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect, std::set<std::pair<std::string,std::string>>::iterator &setItr){
+    //std::vector data;
+    std::vector<std::pair<int,std::string>> studentsByGrade;
+    auto itr = nameIndirect.begin();
+    while(itr != nameIndirect.end()) {
+        const std::string &name = std::get<0>(*itr);
+        std::cout << name << " ";
+        int sumGrades = 0;
+        for (int i = 0; i < 4; i++) {
+            sumGrades += students[std::make_pair(itr->first,itr->second)];
+            //std::cout << std::get<0>(*itr) << " " << std::get<1>(*itr) << " " << std::get<2>(*itr) << std::endl;
+            std::advance(itr, 1);
+        }
+        std::cout << sumGrades << std::endl;
+}
+}
+    int main() {
+        std::unordered_map<nameSub, int, hashFunc> students;
+        std::unordered_map<nameSub, int, hashFunc>::iterator itr;
+        std::set<std::pair<std::string, std::string>> nameIndirect;
+        std::set<std::tuple<int, std::string, std::string>> gradeIndirect;
+        std::set<std::tuple<int, std::string, std::string>>::iterator gradeItr;
+        std::set<std::pair<std::string, std::string>>::iterator setItr;
 
 
+        std::string line;
+        std::ifstream infile("data.txt");
 
-    std::string line;
-    std::ifstream infile("data.txt");
+        std::string name;
+        std::string subject;
+        int grade;
 
-    std::string name;
-    std::string subject;
-    int grade;
+        while (infile >> name >> subject >> grade) {
+            //students[nameSub("Ellis","Mathematics")] = 67;
+            students[nameSub(name, subject)] = grade;
+            nameIndirect.emplace(name, subject);
+            gradeIndirect.emplace(grade, name, subject);
+        }
 
-    while (infile >> name >> subject >> grade) {
-        //students[nameSub("Ellis","Mathematics")] = 67;
-        students[nameSub(name,subject)] = grade;
-        nameIndirect.emplace(name,subject);
-        gradeIndirect.emplace(grade,name,subject);
+        //displayByName(students,nameIndirect,setItr);
+        std::cout << "====================================================" << std::endl;
+        //displayByGrade(students,gradeIndirect,gradeItr);
+
+        //checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect,std::string &name){
+        std::string searchStudent = "Zoe";
+        //checkRecord(students,nameIndirect,gradeIndirect,searchStudent);
+        //displayByName(students,nameIndirect,setItr);
+        std::cout << "====================================================" << std::endl;
+
+        //displaySubjectGrade(students, nameIndirect, setItr, 3);
+        //void displaySubjectGrade(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect, std::set<std::tuple<int,std::string,std::string>>::iterator &gradeItr){
+
+        dispalyTotalMarks(students, nameIndirect, setItr);
+
+
+        //std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect, std::set<std::pair<std::string,std::string>>::iterator &setItr
+
     }
 
-    //displayByName(students,nameIndirect,setItr);
-    std::cout << "====================================================" << std::endl;
-    //displayByGrade(students,gradeIndirect,gradeItr);
-
-    //checkRecord(std::unordered_map<nameSub,int,hashFunc> &students,std::set<std::pair<std::string,std::string>> &nameIndirect,std::set<std::tuple<int,std::string,std::string>> &gradeIndirect,std::string &name){
-    std::string searchStudent = "Zoe";
-    //checkRecord(students,nameIndirect,gradeIndirect,searchStudent);
-    //displayByName(students,nameIndirect,setItr);
-    std::cout << "====================================================" << std::endl;
-    displayStudent(students,nameIndirect,searchStudent,setItr);
-    }
 
 //unordered_map
 //---------------------------------------------------------
@@ -156,6 +186,5 @@ void displaySubjectGrade(std::unordered_map<nameSub,int,hashFunc> &students,std:
 
 
 //TO ADD
-//= sort by certain grades, skip 4 records at a time
 //= sort by total marks
 //= how many students have obtained more than a given marks in a particular subject or in total marks
