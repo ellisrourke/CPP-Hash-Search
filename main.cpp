@@ -159,7 +159,9 @@ void dispalyTotalMarks(std::unordered_map<nameSub,int,hashFunc> &students,std::s
             nameIndirect.emplace(name, subject);
             gradeIndirect.emplace(grade, name, subject);
         }
-        std::cout << "1:\n";
+        std::cout << "1: Display Students sorted by name\n2: Display students sorted bu grade\n3: display total marks";
+        std::cout << "\n4: Display total marks above threshold\n5: Display student marks for subject\n6: Display student marks for subject above threshold";
+        std::cout << "\n7: Check if student exists\n8: Display all grades for a student\n";
         int select = 0;
         while(select != -1){
             std::cout << "Enter selection -> ";
